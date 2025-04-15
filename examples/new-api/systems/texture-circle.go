@@ -10,7 +10,6 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/negrel/assert"
 	"gomp/examples/new-api/components"
-	"gomp/pkg/ecs"
 	"gomp/stdcomponents"
 	"runtime"
 	"time"
@@ -39,7 +38,7 @@ func (s *TextureCircleSystem) Init() {
 }
 
 func (s *TextureCircleSystem) Run(dt time.Duration) {
-	s.Circles.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, i int) bool {
+	for entity := range s.Circles.EachEntityParallel(s.numWorkers) {
 		circle := s.Circles.GetUnsafe(entity)
 		assert.NotNil(circle, "circle is nil; entity: %d", entity)
 		texture := s.Textures.GetUnsafe(entity)
@@ -60,8 +59,7 @@ func (s *TextureCircleSystem) Run(dt time.Duration) {
 		texture.Origin.X = circle.Origin.X + circle.Radius
 		texture.Origin.Y = circle.Origin.Y + circle.Radius
 		texture.Tint = circle.Color
-		return true
-	})
+	}
 }
 
 func (s *TextureCircleSystem) Destroy() {

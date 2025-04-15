@@ -48,24 +48,22 @@ func (s *ColliderSystem) Init() {
 func (s *ColliderSystem) Run(dt time.Duration) {
 	var accAABB = make([][]ecs.Entity, s.numWorkers)
 	var accGenericColliders = make([][]ecs.Entity, s.numWorkers)
-	s.BoxColliders.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, workerId int) bool {
+	for entity, workerId := range s.BoxColliders.EachEntityParallel(s.numWorkers) {
 		if !s.GenericColliders.Has(entity) {
 			accGenericColliders[workerId] = append(accGenericColliders[workerId], entity)
 		}
 		if !s.AABB.Has(entity) {
 			accAABB[workerId] = append(accAABB[workerId], entity)
 		}
-		return true
-	})
-	s.CircleColliders.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, workerId int) bool {
+	}
+	for entity, workerId := range s.CircleColliders.EachEntityParallel(s.numWorkers) {
 		if !s.GenericColliders.Has(entity) {
 			accGenericColliders[workerId] = append(accGenericColliders[workerId], entity)
 		}
 		if !s.AABB.Has(entity) {
 			accAABB[workerId] = append(accAABB[workerId], entity)
 		}
-		return true
-	})
+	}
 	for i := range accAABB {
 		a := accAABB[i]
 		for _, entity := range a {
@@ -79,7 +77,7 @@ func (s *ColliderSystem) Run(dt time.Duration) {
 		}
 	}
 
-	s.BoxColliders.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, _ int) bool {
+	for entity := range s.BoxColliders.EachEntityParallel(s.numWorkers) {
 		boxCollider := s.BoxColliders.GetUnsafe(entity)
 
 		genCollider := s.GenericColliders.GetUnsafe(entity)
@@ -91,10 +89,9 @@ func (s *ColliderSystem) Run(dt time.Duration) {
 		genCollider.Shape = stdcomponents.BoxColliderShape
 		genCollider.AllowSleep = boxCollider.AllowSleep
 
-		return true
-	})
+	}
 
-	s.BoxColliders.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, _ int) bool {
+	for entity := range s.BoxColliders.EachEntityParallel(s.numWorkers) {
 		boxCollider := s.BoxColliders.GetUnsafe(entity)
 		assert.NotNil(boxCollider)
 
@@ -125,11 +122,9 @@ func (s *ColliderSystem) Run(dt time.Duration) {
 
 		aabb.Min = position.XY.Add(aabb.Min)
 		aabb.Max = position.XY.Add(aabb.Max)
+	}
 
-		return true
-	})
-
-	s.CircleColliders.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, _ int) bool {
+	for entity := range s.CircleColliders.EachEntityParallel(s.numWorkers) {
 		circleCollider := s.CircleColliders.GetUnsafe(entity)
 		assert.NotNil(circleCollider)
 
@@ -142,11 +137,9 @@ func (s *ColliderSystem) Run(dt time.Duration) {
 		genCollider.Offset.Y = circleCollider.Offset.Y
 		genCollider.Shape = stdcomponents.CircleColliderShape
 		genCollider.AllowSleep = circleCollider.AllowSleep
+	}
 
-		return true
-	})
-
-	s.CircleColliders.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, _ int) bool {
+	for entity := range s.CircleColliders.EachEntityParallel(s.numWorkers) {
 		circleCollider := s.CircleColliders.GetUnsafe(entity)
 		assert.NotNil(circleCollider)
 
@@ -164,12 +157,11 @@ func (s *ColliderSystem) Run(dt time.Duration) {
 		aabb.Min = position.XY.Add(offset).Sub(scaledRadius)
 		aabb.Max = position.XY.Add(offset).Add(scaledRadius)
 
-		return true
-	})
+	}
 
 	var accColliderSleepCreate = make([][]ecs.Entity, s.numWorkers)
 	var accColliderSleepDelete = make([][]ecs.Entity, s.numWorkers)
-	s.GenericColliders.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, workerId int) bool {
+	for entity, workerId := range s.GenericColliders.EachEntityParallel(s.numWorkers) {
 		genCollider := s.GenericColliders.GetUnsafe(entity)
 		if genCollider.AllowSleep {
 			shouldSleep := true
@@ -190,8 +182,7 @@ func (s *ColliderSystem) Run(dt time.Duration) {
 				}
 			}
 		}
-		return true
-	})
+	}
 	for i := range accColliderSleepCreate {
 		a := accColliderSleepCreate[i]
 		for _, entity := range a {

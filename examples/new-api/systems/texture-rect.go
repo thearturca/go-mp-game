@@ -10,7 +10,6 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/negrel/assert"
 	"gomp/examples/new-api/components"
-	"gomp/pkg/ecs"
 	"gomp/stdcomponents"
 	"runtime"
 	"time"
@@ -38,7 +37,7 @@ func (s *TextureRectSystem) Init() {
 
 func (s *TextureRectSystem) Run(dt time.Duration) {
 	// Create shallow copy of texture to draw rectangles
-	s.TextureRect.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, i int) bool {
+	for entity := range s.TextureRect.EachEntityParallel(s.numWorkers) {
 		rect := s.TextureRect.GetUnsafe(entity)
 		assert.NotNil(rect, "rect is nil; entity: %d", entity)
 		texture := s.Textures.GetUnsafe(entity)
@@ -49,8 +48,7 @@ func (s *TextureRectSystem) Run(dt time.Duration) {
 		texture.Rotation = rect.Rotation
 		texture.Origin = rect.Origin
 		texture.Tint = rect.Color
-		return true
-	})
+	}
 }
 
 func (s *TextureRectSystem) Destroy() {

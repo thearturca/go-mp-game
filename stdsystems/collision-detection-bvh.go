@@ -111,15 +111,14 @@ func (s *CollisionDetectionBVHSystem) Run(dt time.Duration) {
 func (s *CollisionDetectionBVHSystem) Destroy() {}
 
 func (s *CollisionDetectionBVHSystem) findEntityCollisions() {
-	s.GenericCollider.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, workerId int) bool {
+	for entity, workerId := range s.GenericCollider.EachEntityParallel(s.numWorkers) {
 		potentialEntities := s.broadPhase(entity, make([]ecs.Entity, 0, 64))
 		if len(potentialEntities) == 0 {
-			return true
+			continue
 		}
 
 		s.narrowPhase(entity, potentialEntities, workerId)
-		return true
-	})
+	}
 }
 
 func (s *CollisionDetectionBVHSystem) registerCollisionEvents() {

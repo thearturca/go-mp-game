@@ -9,7 +9,6 @@ package stdsystems
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/negrel/assert"
-	"gomp/pkg/ecs"
 	"gomp/stdcomponents"
 	"gomp/vectors"
 	"math"
@@ -35,31 +34,28 @@ func (s *TexturePositionSmoothSystem) Init() {
 func (s *TexturePositionSmoothSystem) Run(dt time.Duration) {
 	//DEBUG Temporary, TODO: remove
 	if rl.IsKeyPressed(rl.KeyI) {
-		s.TexturePositionSmooth.EachComponentParallel(s.numWorkers)(func(t *stdcomponents.TexturePositionSmooth, i int) bool {
+		for t := range s.TexturePositionSmooth.EachComponentParallel(s.numWorkers) {
 			*t = stdcomponents.TexturePositionSmoothOff
-			return true
-		})
+		}
 	}
 	if rl.IsKeyPressed(rl.KeyO) {
-		s.TexturePositionSmooth.EachComponentParallel(s.numWorkers)(func(t *stdcomponents.TexturePositionSmooth, i int) bool {
+		for t := range s.TexturePositionSmooth.EachComponentParallel(s.numWorkers) {
 			*t = stdcomponents.TexturePositionSmoothLerp
-			return true
-		})
+		}
 	}
 	if rl.IsKeyPressed(rl.KeyP) {
-		s.TexturePositionSmooth.EachComponentParallel(s.numWorkers)(func(t *stdcomponents.TexturePositionSmooth, i int) bool {
+		for t := range s.TexturePositionSmooth.EachComponentParallel(s.numWorkers) {
 			*t = stdcomponents.TexturePositionSmoothExpDecay
-			return true
-		})
+		}
 	}
 	//END DEBUG
 
-	s.TexturePositionSmooth.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, i int) bool {
+	for entity := range s.TexturePositionSmooth.EachEntityParallel(s.numWorkers) {
 		position := s.Position.GetUnsafe(entity)
 		texture := s.RLTexture.GetUnsafe(entity)
 		smooth := s.TexturePositionSmooth.GetUnsafe(entity)
 		if texture == nil {
-			return true
+			continue
 		}
 		assert.Nil(position, "position is nil")
 
@@ -76,9 +72,7 @@ func (s *TexturePositionSmoothSystem) Run(dt time.Duration) {
 			texture.Dest.Y = xy.Y
 		default:
 		}
-
-		return true
-	})
+	}
 }
 
 func (s *TexturePositionSmoothSystem) Destroy() {}

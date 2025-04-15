@@ -35,16 +35,15 @@ func (s *CullingSystem) Init() {
 }
 
 func (s *CullingSystem) Run(dt time.Duration) {
-	s.Renderables.EachComponentParallel(s.numWorkers)(func(r *stdcomponents.Renderable, i int) bool {
+	for r := range s.Renderables.EachComponentParallel(s.numWorkers) {
 		r.Observed = false
-		return true
-	})
+	}
 
 	s.Cameras.EachEntity()(func(entity ecs.Entity) bool {
 		camera := s.Cameras.GetUnsafe(entity)
 		cameraRect := camera.Rect()
 
-		s.Renderables.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, _ int) bool {
+		for entity := range s.Renderables.EachEntityParallel(s.numWorkers) {
 			renderable := s.Renderables.GetUnsafe(entity)
 			assert.NotNil(renderable)
 
@@ -56,14 +55,13 @@ func (s *CullingSystem) Run(dt time.Duration) {
 			if s.intersects(cameraRect, textureRect) {
 				renderable.Observed = true
 			}
-			return true
-		})
+		}
 		return true
 	})
 
 	var accRenderVisibleCreate = make([][]ecs.Entity, s.numWorkers)
 	var accRenderVisibleDelete = make([][]ecs.Entity, s.numWorkers)
-	s.Renderables.EachEntityParallel(s.numWorkers)(func(entity ecs.Entity, workerId int) bool {
+	for entity, workerId := range s.Renderables.EachEntityParallel(s.numWorkers) {
 		renderable := s.Renderables.GetUnsafe(entity)
 		assert.NotNil(renderable)
 		if !s.RenderVisible.Has(entity) {
@@ -75,8 +73,7 @@ func (s *CullingSystem) Run(dt time.Duration) {
 				accRenderVisibleDelete[workerId] = append(accRenderVisibleDelete[workerId], entity)
 			}
 		}
-		return true
-	})
+	}
 	for a := range accRenderVisibleCreate {
 		for _, entity := range accRenderVisibleCreate[a] {
 			s.RenderVisible.Create(entity, stdcomponents.RenderVisible{})

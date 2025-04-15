@@ -8,7 +8,6 @@ package stdsystems
 
 import (
 	"github.com/negrel/assert"
-	"gomp/pkg/ecs"
 	"gomp/stdcomponents"
 	"math"
 	"runtime"
@@ -34,7 +33,7 @@ func (s *VelocitySystem) Init() {
 func (s *VelocitySystem) Run(dt time.Duration) {
 	dtSec := float32(dt.Seconds())
 
-	s.Velocities.EachEntityParallel(s.numWorkers)(func(e ecs.Entity, _ int) bool {
+	for e := range s.Velocities.EachEntityParallel(s.numWorkers) {
 		velocity := s.Velocities.GetUnsafe(e)
 		assert.True(s.isVelocityValid(velocity))
 
@@ -43,8 +42,7 @@ func (s *VelocitySystem) Run(dt time.Duration) {
 
 		position.XY.X += velocity.X * dtSec
 		position.XY.Y += velocity.Y * dtSec
-		return true
-	})
+	}
 }
 
 func (s *VelocitySystem) Destroy() {}
