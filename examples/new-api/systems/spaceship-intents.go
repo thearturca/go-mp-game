@@ -15,7 +15,6 @@ Thank you for your support!
 package systems
 
 import (
-	"gomp/examples/new-api/assets"
 	"gomp/examples/new-api/components"
 	"gomp/examples/new-api/entities"
 	"gomp/pkg/ecs"
@@ -136,14 +135,10 @@ func (s *SpaceshipIntentsSystem) Run(dt time.Duration) {
 
 				fireSoundEntity := s.EntityManager.Create()
 
-				s.SoundEffects.Create(fireSoundEntity, components.SoundEffect{
-					Clip:      assets.Audio.Get("gun_sound.wav"),
-					IsPlaying: false,
-					IsLooping: false,
-					Pitch:     1.0,
-					Volume:    1.0,
-					Pan:       0.5,
-				})
+				s.SoundEffects.Create(
+					fireSoundEntity,
+					components.NewSoundEffect("gun_sound.wav").Build(),
+				)
 			}
 		} else {
 			weapon.CooldownLeft -= dt

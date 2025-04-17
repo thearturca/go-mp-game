@@ -15,7 +15,6 @@ Thank you for your support!
 package systems
 
 import (
-	"gomp/examples/new-api/assets"
 	"gomp/examples/new-api/components"
 	"gomp/pkg/ecs"
 	"gomp/stdcomponents"
@@ -103,15 +102,13 @@ func (s *CollisionHandlerSystem) checkPlayerCollisionEnter(e1, e2 ecs.Entity) bo
 
 			playerPos := s.Positions.GetUnsafe(e1)
 			s.Positions.Create(sfxEntity, stdcomponents.Position{XY: playerPos.XY})
-
-			s.SoundEffects.Create(sfxEntity, components.SoundEffect{
-				Clip:      assets.Audio.Get("damage_sound.wav"),
-				Pitch:     float32(1.0 + (float32(hp.MaxHp)-float32(hp.Hp))/float32(hp.MaxHp)), // higher pitch = less hp
-				IsPlaying: false,
-				IsLooping: false,
-				Volume:    1.0,
-				Pan:       0.5,
-			})
+			// higher pitch = less hp
+			s.SoundEffects.Create(
+				sfxEntity,
+				components.NewSoundEffect("damage_sound.wav").
+					WithPitch(float32(1.0+(float32(hp.MaxHp)-float32(hp.Hp))/float32(hp.MaxHp))).
+					Build(),
+			)
 
 			return true
 		}

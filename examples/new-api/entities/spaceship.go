@@ -118,14 +118,14 @@ func CreateSpaceShip(
 	})
 
 	props.SpaceshipIntents.Create(entity, components.SpaceshipIntent{})
-	props.SoundEffects.Create(entity, components.SoundEffect{
-		Clip:      assets.Audio.Get("fly_sound.wav"),
-		IsPlaying: false,
-		IsLooping: true,
-		Pitch:     1.0,
-		Volume:    1.0,
-		Pan:       0.5,
-	})
+
+	props.SoundEffects.Create(
+		entity,
+		components.NewSoundEffect("fly_sound.wav").
+			WithLoop(true).
+			WithVolume(0). // volume is zero by default because its controlled by spaceship speed
+			Build(),
+	)
 
 	props.Renderables.Create(entity, stdcomponents.Renderable{
 		Type:       stdcomponents.SpriteRenderableType,

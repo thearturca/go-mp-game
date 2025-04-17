@@ -41,7 +41,7 @@ func (s *AudioSystem) Run(dt time.Duration) {
 		clip := soundEffect.Clip
 
 		// check if clip is valid
-		if clip == nil || clip.FrameCount == 0 {
+		if clip == nil || rl.IsSoundValid(*clip) == false {
 			return true
 		}
 
