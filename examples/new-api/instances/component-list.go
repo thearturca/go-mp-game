@@ -62,6 +62,7 @@ type ComponentList struct {
 	SpaceshipIntent      components.SpaceshipIntentComponentManager
 	AsteroidSceneManager components.AsteroidSceneManagerComponentManager
 	SoundEffects         components.SoundEffectsComponentManager
+	SpatialAudio         components.SpatialAudioComponentManager
 	TextureRect          components.TextureRectComponentManager
 	PrimitiveCircle      components.PrimitiveCircleComponentManager
 	RenderVisible        stdcomponents.RenderVisibleComponentManager
@@ -112,6 +113,7 @@ func NewComponentList() ComponentList {
 		SpaceshipIntent:      components.NewSpaceshipIntentComponentManager(),
 		AsteroidSceneManager: components.NewAsteroidSceneManagerComponentManager(),
 		SoundEffects:         components.NewSoundEffectsComponentManager(),
+		SpatialAudio:         components.NewSpatialAudioComponentManager(),
 		TextureRect:          components.NewTextureRectComponentManager(),
 		PrimitiveCircle:      components.NewTextureCircleComponentManager(),
 	}
